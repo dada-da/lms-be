@@ -10,8 +10,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     // Spring Data generates the SQL from the method name:
     // SELECT * FROM users WHERE email = ?
-    Optional<UserEntity> findByEmail(String Email);
+    Optional<UserEntity> findByEmail(String email);
 
     // SELECT COUNT(*) > 0 FROM users WHERE email = ?
-    boolean existsByEmail(String Email);
+    boolean existsByEmail(String email);
 }
