@@ -20,6 +20,11 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(EmailDuplicatedException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicatedEmail(EmailDuplicatedException ex) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     // Handles: @Valid failures on @RequestBody
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {

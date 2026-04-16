@@ -1,5 +1,6 @@
 package org.com.lms_be.feature.user;
 
+import org.com.lms_be.exception.EmailDuplicatedException;
 import org.com.lms_be.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,7 +21,7 @@ public class UserService {
     // CREATE
     public UserResponseDTO createUser(UserRequestDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("Email already exists: " + dto.getEmail());
+            throw new EmailDuplicatedException("Email already exists: " + dto.getEmail());
         }
 
         UserEntity entity = new UserEntity();
