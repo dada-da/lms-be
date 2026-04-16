@@ -1,31 +1,31 @@
-package org.com.lms_be.feature.course;
+package org.com.lms_be.feature.answer;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import org.com.lms_be.feature.user.UserEntity;
+import org.com.lms_be.feature.question.QuestionEntity;
 
 import java.time.Instant;
 
 @Getter
 @Setter
 @Entity
-@Table(name="courses")
-public class CourseEntity {
+@Table(name="answer")
+public class AnswerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private String title;
+    private String answer;
 
     @Column
-    private String description;
+    private boolean isCorrect;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "instructor_id")
-    private UserEntity instructor;
+    @JoinColumn(name = "question_id")
+    private QuestionEntity question;
 
     @Column
     private Instant updatedDate;

@@ -1,18 +1,19 @@
-package org.com.lms_be.feature.course;
+package org.com.lms_be.feature.lesson;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import org.com.lms_be.feature.user.UserEntity;
+import org.com.lms_be.feature.course.CourseEntity;
+import org.com.lms_be.util.ContentType;
 
 import java.time.Instant;
 
 @Getter
 @Setter
 @Entity
-@Table(name="courses")
-public class CourseEntity {
+@Table(name = "lessons")
+public class LessonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,9 +24,19 @@ public class CourseEntity {
     @Column
     private String description;
 
+    @Column
+    private int sequence;
+
+    @Column
+    private String content;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ContentType contentType;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "instructor_id")
-    private UserEntity instructor;
+    @JoinColumn(name = "course_id")
+    private CourseEntity course;
 
     @Column
     private Instant updatedDate;
