@@ -16,5 +16,5 @@ public class CourseRequestDTO {
     private String description;
 
     @NotBlank(message = "User ID cannot be blank")
-    private String userId;
+    private Long userId;
 }

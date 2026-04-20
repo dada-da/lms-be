@@ -10,7 +10,7 @@ import java.time.Instant;
 @Setter
 @AllArgsConstructor
 public class CourseResponseDTO {
-    private String id;
+    private Long id;
     private String title;
     private String description;
     private Instant createdAt;
