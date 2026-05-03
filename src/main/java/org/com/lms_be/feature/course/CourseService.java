@@ -2,11 +2,12 @@ package org.com.lms_be.feature.course;
 
 import org.com.lms_be.exception.ResourceNotFoundException;
 import org.com.lms_be.feature.user.UserEntity;
-import org.com.lms_be.feature.user.UserResponseDTO;
 import org.com.lms_be.feature.user.UserService;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,56 +21,44 @@ public class CourseService {
     }
 
     public CourseResponseDTO create(CourseRequestDTO request) {
-        UserResponseDTO userResponse = this.userService.getUserById(request.getUserId());
-
-        if (userResponse == null) {
-            throw new ResourceNotFoundException("User", request.getUserId());
-        }
+        UserEntity userResponse = this.userService.getVerifiedUserReference(request.getUserId());
 
         CourseEntity entity = new CourseEntity();
         entity.setDescription(request.getDescription());
         entity.setTitle(request.getTitle());
 
-        UserEntity entityUser = new UserEntity();
-
-        entity.setInstructor(entityUser);
+        entity.setInstructor(userResponse);
 
         return toResponseDTO(courseRepository.save(entity));
     }
 
-    public CourseResponseDTO getById(Long id) {
-        CourseEntity course = courseRepository.findById(id)
+    public CourseEntity getById(Long id) {
+        return courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course", id));
-        return toResponseDTO(course);
     }
 
     public List<CourseResponseDTO> getAll() {
         return courseRepository.findAll().stream().map(this::toResponseDTO).collect(Collectors.toList());
     }
 
-    public CourseResponseDTO updateById(Long id, CourseRequestDTO request) {
-        UserResponseDTO userResponse = this.userService.getUserById(request.getUserId());
-        CourseResponseDTO response = this.getById(id);
+    public CourseResponseDTO updateById(Long id, Map<String, Object> fields) {
+        CourseEntity response = this.getById(id);
 
-        if (userResponse == null) {
-            throw new ResourceNotFoundException("User", request.getUserId());
-        }
+        fields.forEach((key, value) -> {
+            Field field = null;
+            try {
+                field = CourseEntity.class.getDeclaredField(key);
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                field.set(response, value);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
-        if (response == null) {
-            throw new ResourceNotFoundException("Course", id);
-        }
-
-        CourseEntity entity = new CourseEntity();
-
-        if (request.getTitle() != null) {
-            entity.setTitle(request.getTitle());
-        }
-
-        if (request.getDescription() != null) {
-            entity.setDescription(request.getDescription());
-        }
-
-        return toResponseDTO(courseRepository.save(entity));
+        return toResponseDTO(response);
     }
 
     public void deleteById(Long id) {

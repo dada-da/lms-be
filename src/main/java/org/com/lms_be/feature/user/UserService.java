@@ -83,4 +83,12 @@ public class UserService {
                 entity.getCreatedDate()
         );
     }
+
+    public UserEntity getVerifiedUserReference(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User", id);
+        }
+
+       return userRepository.getReferenceById(id);
+    }
 }
