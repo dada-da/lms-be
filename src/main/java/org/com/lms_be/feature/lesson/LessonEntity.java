@@ -27,7 +27,7 @@ public class LessonEntity {
     @Column
     private int sequence;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Enumerated(EnumType.STRING)

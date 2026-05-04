@@ -1,7 +1,13 @@
 package org.com.lms_be.feature.lesson;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.com.lms_be.util.ContentType;
 
+@Getter
+@Setter
+@AllArgsConstructor
 public class LessonResponseDTO {
     private Long id;
     private String title;
@@ -10,4 +16,12 @@ public class LessonResponseDTO {
     private String content;
     private ContentType contentType;
 
+    LessonResponseDTO(LessonEntity entity) {
+        this.id = entity.getId();
+        this.title = entity.getTitle();
+        this.description = entity.getDescription();
+        this.sequence = entity.getSequence();
+        this.content = entity.getContent();
+        this.contentType = entity.getContentType();
+    }
 }
