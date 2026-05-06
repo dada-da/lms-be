@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/course").permitAll()
                         .requestMatchers(HttpMethod.GET, "/lesson").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/category").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
