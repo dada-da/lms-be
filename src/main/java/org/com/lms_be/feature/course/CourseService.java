@@ -1,33 +1,45 @@
 package org.com.lms_be.feature.course;
 
 import org.com.lms_be.exception.ResourceNotFoundException;
+import org.com.lms_be.feature.lesson.LessonAggregate;
+import org.com.lms_be.feature.lesson.LessonRepository;
 import org.com.lms_be.feature.user.UserEntity;
 import org.com.lms_be.feature.user.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class CourseService {
     private final UserService userService;
     private final CourseRepository courseRepository;
+    private final LessonRepository lessonRepository;
 
-    public CourseService(UserService userService, CourseRepository courseRepository) {
+    public CourseService(UserService userService, CourseRepository courseRepository, LessonRepository lessonRepository) {
         this.userService = userService;
         this.courseRepository = courseRepository;
+        this.lessonRepository = lessonRepository;
     }
 
     public CourseResponseDTO create(CourseRequestDTO request) {
         UserEntity userResponse = this.userService.getVerifiedUserReference(request.getUserId());
 
         CourseEntity entity = new CourseEntity();
-        entity.setDescription(request.getDescription());
         entity.setTitle(request.getTitle());
-
+        entity.setDescription(request.getDescription());
+        entity.setThumbnailUrl(request.getThumbnailUrl());
+        entity.setPrice(request.getPrice());
+        entity.setCategory(request.getCategory());
+        entity.setTags(request.getTags() != null ? new HashSet<>(request.getTags()) : new HashSet<>());
         entity.setInstructor(userResponse);
 
-        return toResponseDTO(courseRepository.save(entity));
+        CourseEntity saved = courseRepository.save(entity);
+        return toResponseDTO(saved, emptyAggregate(saved.getId()));
     }
 
     public CourseEntity getById(Long id) {
@@ -35,8 +47,26 @@ public class CourseService {
                 .orElseThrow(() -> new ResourceNotFoundException("Course", id));
     }
 
+    public CourseResponseDTO getResponseById(Long id) {
+        CourseEntity entity = getById(id);
+        LessonAggregate agg = lessonRepository.findAggregatesByCourseIds(List.of(id))
+                .stream().findFirst().orElseGet(() -> emptyAggregate(id));
+        return toResponseDTO(entity, agg);
+    }
+
     public List<CourseResponseDTO> getAll() {
-        return courseRepository.findAll().stream().map(this::toResponseDTO).collect(Collectors.toList());
+        List<CourseEntity> courses = courseRepository.findAll();
+        if (courses.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> ids = courses.stream().map(CourseEntity::getId).toList();
+        Map<Long, LessonAggregate> stats = lessonRepository.findAggregatesByCourseIds(ids).stream()
+                .collect(Collectors.toMap(LessonAggregate::courseId, Function.identity()));
+
+        return courses.stream()
+                .map(c -> toResponseDTO(c, stats.getOrDefault(c.getId(), emptyAggregate(c.getId()))))
+                .toList();
     }
 
     public CourseResponseDTO updateById(Long id, CoursePatchDTO dto) {
@@ -48,8 +78,23 @@ public class CourseService {
         if (dto.getDescription() != null) {
             entity.setDescription(dto.getDescription().orElse(null));
         }
+        if (dto.getThumbnailUrl() != null) {
+            entity.setThumbnailUrl(dto.getThumbnailUrl().orElse(null));
+        }
+        if (dto.getPrice() != null) {
+            entity.setPrice(dto.getPrice().orElse(null));
+        }
+        if (dto.getCategory() != null) {
+            entity.setCategory(dto.getCategory().orElse(null));
+        }
+        if (dto.getTags() != null) {
+            entity.setTags(dto.getTags().map(HashSet::new).orElseGet(HashSet::new));
+        }
 
-        return toResponseDTO(courseRepository.save(entity));
+        CourseEntity saved = courseRepository.save(entity);
+        LessonAggregate agg = lessonRepository.findAggregatesByCourseIds(List.of(id))
+                .stream().findFirst().orElseGet(() -> emptyAggregate(id));
+        return toResponseDTO(saved, agg);
     }
 
     public void deleteById(Long id) {
@@ -60,7 +105,23 @@ public class CourseService {
         courseRepository.deleteById(id);
     }
 
-    private CourseResponseDTO toResponseDTO(CourseEntity entity) {
-        return new CourseResponseDTO(entity.getId(), entity.getTitle(), entity.getDescription(), entity.getCreatedDate(), entity.getUpdatedDate());
+    private CourseResponseDTO toResponseDTO(CourseEntity entity, LessonAggregate agg) {
+        return new CourseResponseDTO(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getDescription(),
+                entity.getThumbnailUrl(),
+                entity.getPrice(),
+                entity.getCategory(),
+                entity.getTags(),
+                agg.lessonCount() != null ? agg.lessonCount() : 0L,
+                agg.totalDurationMinutes() != null ? agg.totalDurationMinutes() : 0L,
+                entity.getCreatedDate(),
+                entity.getUpdatedDate()
+        );
+    }
+
+    private LessonAggregate emptyAggregate(Long courseId) {
+        return new LessonAggregate(courseId, 0L, 0L);
     }
 }
