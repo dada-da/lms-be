@@ -56,8 +56,8 @@ public class CourseService {
         return toResponseDTO(entity, agg);
     }
 
-    public List<CourseResponseDTO> getAll() {
-        List<CourseEntity> courses = courseRepository.findAllByStatusNot(PublishStatus.ARCHIVED);
+    public List<CourseResponseDTO> getAll(List<PublishStatus> visibleStatuses) {
+        List<CourseEntity> courses = courseRepository.findAllByStatusIn(visibleStatuses);
         if (courses.isEmpty()) {
             return Collections.emptyList();
         }

@@ -1,7 +1,10 @@
 package org.com.lms_be.feature.course;
 
+import org.com.lms_be.util.PublishStatus;
+import org.com.lms_be.util.PublishStatusAccess;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +31,11 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CourseResponseDTO>> getAllCourses() {
-        return ResponseEntity.ok(courseService.getAll());
+    public ResponseEntity<List<CourseResponseDTO>> getAllCourses(
+            @RequestParam(required = false) PublishStatus status,
+            Authentication auth) {
+        List<PublishStatus> visible = PublishStatusAccess.resolveVisibleStatuses(status, auth);
+        return ResponseEntity.ok(courseService.getAll(visible));
     }
 
     @PatchMapping("/{id}")

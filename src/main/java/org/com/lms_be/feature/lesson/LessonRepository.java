@@ -14,6 +14,8 @@ public interface LessonRepository extends JpaRepository<LessonEntity, Long> {
 
     List<LessonEntity> findAllByStatusNot(PublishStatus status);
 
+    List<LessonEntity> findAllByStatusIn(Collection<PublishStatus> statuses);
+
     @Modifying
     @Transactional
     @Query("UPDATE LessonEntity l SET l.status = org.com.lms_be.util.PublishStatus.ARCHIVED WHERE l.course.id = :courseId")

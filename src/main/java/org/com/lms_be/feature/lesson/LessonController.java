@@ -1,7 +1,10 @@
 package org.com.lms_be.feature.lesson;
 
+import org.com.lms_be.util.PublishStatus;
+import org.com.lms_be.util.PublishStatusAccess;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,8 +35,11 @@ public class LessonController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LessonResponseDTO>> getAllLessons() {
-        return ResponseEntity.ok(lessonService.getAll());
+    public ResponseEntity<List<LessonResponseDTO>> getAllLessons(
+            @RequestParam(required = false) PublishStatus status,
+            Authentication auth) {
+        List<PublishStatus> visible = PublishStatusAccess.resolveVisibleStatuses(status, auth);
+        return ResponseEntity.ok(lessonService.getAll(visible));
     }
 
     @DeleteMapping("/{id}")
