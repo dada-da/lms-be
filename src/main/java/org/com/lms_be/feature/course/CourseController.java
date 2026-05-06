@@ -32,12 +32,12 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getAll());
     }
 
-    @PatchMapping("{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<CourseResponseDTO> updateCourse(@PathVariable Long id, @RequestBody CoursePatchDTO coursePatchDTO) {
         return new ResponseEntity<>(courseService.updateById(id, coursePatchDTO), HttpStatus.OK);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<CourseResponseDTO> deleteCourse(@PathVariable Long id) {
         courseService.deleteById(id);
         return ResponseEntity.ok().build();

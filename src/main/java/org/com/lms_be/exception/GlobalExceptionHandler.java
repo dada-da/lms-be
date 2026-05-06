@@ -5,9 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -56,6 +58,16 @@ public class GlobalExceptionHandler {
         body.put("fieldErrors", fieldErrors);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, Object>> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        return buildError(HttpStatus.METHOD_NOT_ALLOWED, ex.getMessage());
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNoHandler(NoHandlerFoundException ex) {
+        return buildError(HttpStatus.NOT_FOUND, "Route not found: " + ex.getHttpMethod() + " " + ex.getRequestURL());
     }
 
     // Catch-all — prevents 500 stack traces leaking to the client
