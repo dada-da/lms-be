@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/lesson")
@@ -23,8 +22,8 @@ public class LessonController {
     }
 
     @PatchMapping("{id}")
-    public ResponseEntity<LessonResponseDTO> updateLesson(@PathVariable Long id, @RequestBody Map<String, Object> lessonRequestDTO) {
-        return new ResponseEntity<>(lessonService.updateById(id, lessonRequestDTO), HttpStatus.OK);
+    public ResponseEntity<LessonResponseDTO> updateLesson(@PathVariable Long id, @RequestBody LessonPatchDTO lessonPatchDTO) {
+        return new ResponseEntity<>(lessonService.updateById(id, lessonPatchDTO), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

@@ -5,9 +5,7 @@ import org.com.lms_be.feature.user.UserEntity;
 import org.com.lms_be.feature.user.UserService;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,24 +39,17 @@ public class CourseService {
         return courseRepository.findAll().stream().map(this::toResponseDTO).collect(Collectors.toList());
     }
 
-    public CourseResponseDTO updateById(Long id, Map<String, Object> fields) {
-        CourseEntity response = this.getById(id);
+    public CourseResponseDTO updateById(Long id, CoursePatchDTO dto) {
+        CourseEntity entity = this.getById(id);
 
-        fields.forEach((key, value) -> {
-            Field field = null;
-            try {
-                field = CourseEntity.class.getDeclaredField(key);
-            } catch (NoSuchFieldException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                field.set(response, value);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        if (dto.getTitle() != null) {
+            entity.setTitle(dto.getTitle().orElse(null));
+        }
+        if (dto.getDescription() != null) {
+            entity.setDescription(dto.getDescription().orElse(null));
+        }
 
-        return toResponseDTO(response);
+        return toResponseDTO(courseRepository.save(entity));
     }
 
     public void deleteById(Long id) {

@@ -5,9 +5,7 @@ import org.springframework.stereotype.Service;
 import org.com.lms_be.feature.course.CourseEntity;
 import org.com.lms_be.feature.course.CourseService;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class LessonService {
@@ -34,26 +32,26 @@ public class LessonService {
         return toResponseDTO(lessonRepository.save(lessonEntity));
     }
 
-    public LessonResponseDTO updateById(Long id, Map<String, Object> fields) {
-        LessonEntity lessonEntity = this.getById(id);
+    public LessonResponseDTO updateById(Long id, LessonPatchDTO dto) {
+        LessonEntity entity = this.getById(id);
 
-        fields.forEach((key, value) -> {
-            Field field = null;
+        if (dto.getTitle() != null) {
+            entity.setTitle(dto.getTitle().orElse(null));
+        }
+        if (dto.getDescription() != null) {
+            entity.setDescription(dto.getDescription().orElse(null));
+        }
+        if (dto.getSequence() != null) {
+            entity.setSequence(dto.getSequence().orElse(0));
+        }
+        if (dto.getContent() != null) {
+            entity.setContent(dto.getContent().orElse(null));
+        }
+        if (dto.getContentType() != null) {
+            entity.setContentType(dto.getContentType().orElse(null));
+        }
 
-            try {
-                field = lessonEntity.getClass().getDeclaredField(key);
-            } catch (NoSuchFieldException e) {
-                throw new RuntimeException(e);
-            }
-
-            try {
-                field.set(lessonEntity, value);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        return toResponseDTO(lessonEntity);
+        return toResponseDTO(lessonRepository.save(entity));
     }
 
     public LessonEntity getById(Long id) {
