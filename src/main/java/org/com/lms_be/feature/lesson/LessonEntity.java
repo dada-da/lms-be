@@ -27,6 +27,9 @@ public class LessonEntity {
     @Column
     private int sequence;
 
+    @Column(name = "duration_minutes")
+    private Integer durationMinutes;
+
     @Column(columnDefinition = "TEXT")
     private String content;
 

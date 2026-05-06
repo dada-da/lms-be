@@ -13,6 +13,7 @@ public class LessonResponseDTO {
     private String title;
     private String description;
     private Integer sequence;
+    private Integer durationMinutes;
     private String content;
     private ContentType contentType;
 
@@ -21,6 +22,7 @@ public class LessonResponseDTO {
         this.title = entity.getTitle();
         this.description = entity.getDescription();
         this.sequence = entity.getSequence();
+        this.durationMinutes = entity.getDurationMinutes();
         this.content = entity.getContent();
         this.contentType = entity.getContentType();
     }

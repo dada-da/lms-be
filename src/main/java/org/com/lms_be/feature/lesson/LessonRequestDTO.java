@@ -22,6 +22,9 @@ public class LessonRequestDTO {
     @Min(value = 1, message = "Lesson sequence must be at least 1")
     private Integer sequence;
 
+    @Min(value = 0, message = "Duration must be 0 or greater")
+    private Integer durationMinutes;
+
     @NotBlank
     private String content;
 

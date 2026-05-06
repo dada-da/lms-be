@@ -28,6 +28,7 @@ public class LessonService {
         lessonEntity.setContent(request.getContent());
         lessonEntity.setContentType(request.getContentType());
         lessonEntity.setSequence(request.getSequence());
+        lessonEntity.setDurationMinutes(request.getDurationMinutes());
 
         return toResponseDTO(lessonRepository.save(lessonEntity));
     }
@@ -49,6 +50,9 @@ public class LessonService {
         }
         if (dto.getContentType() != null) {
             entity.setContentType(dto.getContentType().orElse(null));
+        }
+        if (dto.getDurationMinutes() != null) {
+            entity.setDurationMinutes(dto.getDurationMinutes().orElse(null));
         }
 
         return toResponseDTO(lessonRepository.save(entity));

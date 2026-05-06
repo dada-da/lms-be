@@ -21,6 +21,9 @@ public class LessonPatchDTO {
     private Optional<Integer> sequence;
 
     @JsonDeserialize(using = OptionalFieldDeserializer.class)
+    private Optional<Integer> durationMinutes;
+
+    @JsonDeserialize(using = OptionalFieldDeserializer.class)
     private Optional<String> content;
 
     @JsonDeserialize(using = OptionalFieldDeserializer.class)
