@@ -3,6 +3,7 @@ databases:
     databaseName: lms
     user: lms
     plan: free
+    region: singapore
 
 services:
   - type: web
