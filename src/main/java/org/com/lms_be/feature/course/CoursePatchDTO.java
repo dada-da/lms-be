@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.com.lms_be.feature.category.Category;
 import org.com.lms_be.util.OptionalFieldDeserializer;
+import org.com.lms_be.util.PublishStatus;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -30,4 +31,7 @@ public class CoursePatchDTO {
 
     @JsonDeserialize(using = OptionalFieldDeserializer.class)
     private Optional<Set<String>> tags;
+
+    @JsonDeserialize(using = OptionalFieldDeserializer.class)
+    private Optional<PublishStatus> status;
 }

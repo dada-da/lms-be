@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.com.lms_be.util.ContentType;
 import org.com.lms_be.util.OptionalFieldDeserializer;
+import org.com.lms_be.util.PublishStatus;
 
 import java.util.Optional;
 
@@ -28,4 +29,7 @@ public class LessonPatchDTO {
 
     @JsonDeserialize(using = OptionalFieldDeserializer.class)
     private Optional<ContentType> contentType;
+
+    @JsonDeserialize(using = OptionalFieldDeserializer.class)
+    private Optional<PublishStatus> status;
 }

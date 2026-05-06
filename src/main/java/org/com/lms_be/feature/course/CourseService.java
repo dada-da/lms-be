@@ -5,7 +5,9 @@ import org.com.lms_be.feature.lesson.LessonAggregate;
 import org.com.lms_be.feature.lesson.LessonRepository;
 import org.com.lms_be.feature.user.UserEntity;
 import org.com.lms_be.feature.user.UserService;
+import org.com.lms_be.util.PublishStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -55,7 +57,7 @@ public class CourseService {
     }
 
     public List<CourseResponseDTO> getAll() {
-        List<CourseEntity> courses = courseRepository.findAll();
+        List<CourseEntity> courses = courseRepository.findAllByStatusNot(PublishStatus.ARCHIVED);
         if (courses.isEmpty()) {
             return Collections.emptyList();
         }
@@ -90,6 +92,9 @@ public class CourseService {
         if (dto.getTags() != null) {
             entity.setTags(dto.getTags().map(HashSet::new).orElseGet(HashSet::new));
         }
+        if (dto.getStatus() != null) {
+            dto.getStatus().ifPresent(entity::setStatus);
+        }
 
         CourseEntity saved = courseRepository.save(entity);
         LessonAggregate agg = lessonRepository.findAggregatesByCourseIds(List.of(id))
@@ -97,12 +102,12 @@ public class CourseService {
         return toResponseDTO(saved, agg);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        if (!courseRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Course", id);
-        }
-
-        courseRepository.deleteById(id);
+        CourseEntity entity = getById(id);
+        entity.setStatus(PublishStatus.ARCHIVED);
+        courseRepository.save(entity);
+        lessonRepository.archiveAllByCourseId(id);
     }
 
     private CourseResponseDTO toResponseDTO(CourseEntity entity, LessonAggregate agg) {
@@ -114,6 +119,7 @@ public class CourseService {
                 entity.getPrice(),
                 entity.getCategory(),
                 entity.getTags(),
+                entity.getStatus(),
                 agg.lessonCount() != null ? agg.lessonCount() : 0L,
                 agg.totalDurationMinutes() != null ? agg.totalDurationMinutes() : 0L,
                 entity.getCreatedDate(),

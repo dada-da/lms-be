@@ -1,6 +1,7 @@
 package org.com.lms_be.feature.lesson;
 
 import org.com.lms_be.exception.ResourceNotFoundException;
+import org.com.lms_be.util.PublishStatus;
 import org.springframework.stereotype.Service;
 import org.com.lms_be.feature.course.CourseEntity;
 import org.com.lms_be.feature.course.CourseService;
@@ -54,6 +55,9 @@ public class LessonService {
         if (dto.getDurationMinutes() != null) {
             entity.setDurationMinutes(dto.getDurationMinutes().orElse(null));
         }
+        if (dto.getStatus() != null) {
+            dto.getStatus().ifPresent(entity::setStatus);
+        }
 
         return toResponseDTO(lessonRepository.save(entity));
     }
@@ -64,15 +68,14 @@ public class LessonService {
     }
 
     public List<LessonResponseDTO> getAll() {
-        return lessonRepository.findAll().stream().map(this::toResponseDTO).toList();
+        return lessonRepository.findAllByStatusNot(PublishStatus.ARCHIVED).stream()
+                .map(this::toResponseDTO).toList();
     }
 
     public void deleteById(Long id) {
-        if (!lessonRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Lesson", id);
-        }
-
-        lessonRepository.deleteById(id);
+        LessonEntity entity = getById(id);
+        entity.setStatus(PublishStatus.ARCHIVED);
+        lessonRepository.save(entity);
     }
 
     private LessonResponseDTO toResponseDTO(LessonEntity entity) {

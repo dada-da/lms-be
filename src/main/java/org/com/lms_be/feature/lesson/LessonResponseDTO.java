@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.com.lms_be.util.ContentType;
+import org.com.lms_be.util.PublishStatus;
 
 @Getter
 @Setter
@@ -16,6 +17,7 @@ public class LessonResponseDTO {
     private Integer durationMinutes;
     private String content;
     private ContentType contentType;
+    private PublishStatus status;
 
     LessonResponseDTO(LessonEntity entity) {
         this.id = entity.getId();
@@ -25,5 +27,6 @@ public class LessonResponseDTO {
         this.durationMinutes = entity.getDurationMinutes();
         this.content = entity.getContent();
         this.contentType = entity.getContentType();
+        this.status = entity.getStatus();
     }
 }

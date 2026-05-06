@@ -1,11 +1,11 @@
 package org.com.lms_be.feature.lesson;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.com.lms_be.feature.course.CourseEntity;
 import org.com.lms_be.util.ContentType;
+import org.com.lms_be.util.PublishStatus;
 
 import java.time.Instant;
 
@@ -36,6 +36,10 @@ public class LessonEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ContentType contentType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 16, columnDefinition = "VARCHAR(16) DEFAULT 'PUBLISHED'")
+    private PublishStatus status = PublishStatus.DRAFT;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")

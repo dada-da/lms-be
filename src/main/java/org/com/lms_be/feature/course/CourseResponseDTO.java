@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.com.lms_be.feature.category.Category;
+import org.com.lms_be.util.PublishStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -20,6 +21,7 @@ public class CourseResponseDTO {
     private BigDecimal price;
     private Category category;
     private Set<String> tags;
+    private PublishStatus status;
     private Long lessonCount;
     private Long totalDurationMinutes;
     private Instant createdAt;
