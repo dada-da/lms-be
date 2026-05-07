@@ -1,8 +1,10 @@
 package org.com.lms_be.feature.enrollment;
 
 import jakarta.validation.Valid;
+import org.com.lms_be.util.AuthUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,8 +20,9 @@ public class EnrollmentController {
     }
 
     @PostMapping
-    public ResponseEntity<EnrollmentResponseDTO> enroll(@Valid @RequestBody EnrollmentRequestDTO request) {
-        EnrollmentResponseDTO created = enrollmentService.enroll(request);
+    public ResponseEntity<EnrollmentResponseDTO> enroll(@Valid @RequestBody EnrollmentRequestDTO request,
+                                                        Authentication auth) {
+        EnrollmentResponseDTO created = enrollmentService.enroll(request, AuthUtil.currentUserId(auth));
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -29,10 +32,8 @@ public class EnrollmentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EnrollmentResponseDTO>> getAllEnrollments(
-            @RequestParam(required = false) Long studentId,
-            @RequestParam(required = false) Long courseId) {
-        return ResponseEntity.ok(enrollmentService.getAll(studentId, courseId));
+    public ResponseEntity<List<EnrollmentResponseDTO>> getMyEnrollments(Authentication auth) {
+        return ResponseEntity.ok(enrollmentService.getAllForStudent(AuthUtil.currentUserId(auth)));
     }
 
     @DeleteMapping("/{id}")

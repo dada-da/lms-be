@@ -31,11 +31,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
             if (jwtUtil.isTokenValid(token)) {
                 Claims claims = jwtUtil.extractClaims(token);
-                String email = claims.getSubject();
+                Number userIdClaim = claims.get("userId", Number.class);
+                Long userId = userIdClaim != null ? userIdClaim.longValue() : null;
                 String role = claims.get("role", String.class);
 
                 var auth = new UsernamePasswordAuthenticationToken(
-                        email,
+                        userId,
                         null,
                         List.of(new SimpleGrantedAuthority("ROLE_" + role))
                 );

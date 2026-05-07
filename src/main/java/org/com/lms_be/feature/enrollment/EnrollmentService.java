@@ -33,9 +33,9 @@ public class EnrollmentService {
     }
 
     @Transactional
-    public EnrollmentResponseDTO enroll(EnrollmentRequestDTO request) {
-        UserEntity student = userRepository.findById(request.getStudentId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", request.getStudentId()));
+    public EnrollmentResponseDTO enroll(EnrollmentRequestDTO request, Long studentId) {
+        UserEntity student = userRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", studentId));
 
         if (student.getRole() != UserRole.STUDENT) {
             throw new IllegalArgumentException("Only users with STUDENT role can enroll in a course");
@@ -66,16 +66,10 @@ public class EnrollmentService {
         return toResponseDTO(getEntityById(id));
     }
 
-    public List<EnrollmentResponseDTO> getAll(Long studentId, Long courseId) {
-        List<EnrollmentEntity> entities;
-        if (studentId != null) {
-            entities = enrollmentRepository.findAllByStudentId(studentId);
-        } else if (courseId != null) {
-            entities = enrollmentRepository.findAllByCourseId(courseId);
-        } else {
-            entities = enrollmentRepository.findAll();
-        }
-        return entities.stream().map(this::toResponseDTO).toList();
+    public List<EnrollmentResponseDTO> getAllForStudent(Long studentId) {
+        return enrollmentRepository.findAllByStudentId(studentId).stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 
     @Transactional

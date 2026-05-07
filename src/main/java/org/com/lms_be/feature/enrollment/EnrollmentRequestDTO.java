@@ -8,10 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EnrollmentRequestDTO {
-    @NotNull(message = "Student ID is required")
-    @Min(value = 1, message = "Student ID must be at least 1")
-    private Long studentId;
-
     @NotNull(message = "Course ID is required")
     @Min(value = 1, message = "Course ID must be at least 1")
     private Long courseId;

@@ -1,5 +1,6 @@
 package org.com.lms_be.feature.course;
 
+import org.com.lms_be.util.AuthUtil;
 import org.com.lms_be.util.PublishStatus;
 import org.com.lms_be.util.PublishStatusAccess;
 import org.springframework.http.HttpStatus;
@@ -20,8 +21,9 @@ public class CourseController {
     }
 
     @PostMapping
-    public ResponseEntity<CourseResponseDTO> createCourse(@RequestBody CourseRequestDTO courseRequestDTO) {
-        CourseResponseDTO created = courseService.create(courseRequestDTO);
+    public ResponseEntity<CourseResponseDTO> createCourse(@RequestBody CourseRequestDTO courseRequestDTO,
+                                                          Authentication auth) {
+        CourseResponseDTO created = courseService.create(courseRequestDTO, AuthUtil.currentUserId(auth));
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

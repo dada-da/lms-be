@@ -1,7 +1,9 @@
 package org.com.lms_be.feature.lesson_progress;
 
 import jakarta.validation.Valid;
+import org.com.lms_be.util.AuthUtil;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,14 +19,14 @@ public class LessonProgressController {
     }
 
     @PutMapping
-    public ResponseEntity<LessonProgressResponseDTO> upsert(@Valid @RequestBody LessonProgressRequestDTO request) {
-        return ResponseEntity.ok(lessonProgressService.upsert(request));
+    public ResponseEntity<LessonProgressResponseDTO> upsert(@Valid @RequestBody LessonProgressRequestDTO request,
+                                                            Authentication auth) {
+        return ResponseEntity.ok(lessonProgressService.upsert(request, AuthUtil.currentUserId(auth)));
     }
 
     @GetMapping
-    public ResponseEntity<List<LessonProgressResponseDTO>> getAll(
-            @RequestParam Long studentId,
-            @RequestParam Long courseId) {
-        return ResponseEntity.ok(lessonProgressService.getAll(studentId, courseId));
+    public ResponseEntity<List<LessonProgressResponseDTO>> getAll(@RequestParam Long courseId,
+                                                                  Authentication auth) {
+        return ResponseEntity.ok(lessonProgressService.getAllForStudent(AuthUtil.currentUserId(auth), courseId));
     }
 }

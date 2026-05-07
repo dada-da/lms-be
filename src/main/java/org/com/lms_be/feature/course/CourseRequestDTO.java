@@ -1,7 +1,6 @@
 package org.com.lms_be.feature.course;
 
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -36,8 +35,4 @@ public class CourseRequestDTO {
 
     @Size(max = 10, message = "Maximum 10 tags allowed")
     private Set<@Size(max = 64) String> tags = new HashSet<>();
-
-    @NotNull(message = "ID cannot be null")
-    @Min(value = 1, message = "ID must be at least 1")
-    private Long userId;
 }

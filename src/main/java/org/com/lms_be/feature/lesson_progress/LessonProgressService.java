@@ -41,9 +41,9 @@ public class LessonProgressService {
     }
 
     @Transactional
-    public LessonProgressResponseDTO upsert(LessonProgressRequestDTO request) {
-        UserEntity student = userRepository.findById(request.getStudentId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", request.getStudentId()));
+    public LessonProgressResponseDTO upsert(LessonProgressRequestDTO request, Long studentId) {
+        UserEntity student = userRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", studentId));
 
         LessonEntity lesson = lessonService.getById(request.getLessonId());
         if (lesson.getStatus() != PublishStatus.PUBLISHED) {
@@ -77,10 +77,7 @@ public class LessonProgressService {
         return toResponseDTO(saved);
     }
 
-    public List<LessonProgressResponseDTO> getAll(Long studentId, Long courseId) {
-        if (studentId == null || courseId == null) {
-            throw new IllegalArgumentException("Both studentId and courseId are required");
-        }
+    public List<LessonProgressResponseDTO> getAllForStudent(Long studentId, Long courseId) {
         return lessonProgressRepository.findAllByStudentIdAndCourseId(studentId, courseId).stream()
                 .map(this::toResponseDTO)
                 .toList();

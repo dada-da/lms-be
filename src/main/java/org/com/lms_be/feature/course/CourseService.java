@@ -28,8 +28,8 @@ public class CourseService {
         this.lessonRepository = lessonRepository;
     }
 
-    public CourseResponseDTO create(CourseRequestDTO request) {
-        UserEntity userResponse = this.userService.getVerifiedUserReference(request.getUserId());
+    public CourseResponseDTO create(CourseRequestDTO request, Long instructorId) {
+        UserEntity userResponse = this.userService.getVerifiedUserReference(instructorId);
 
         CourseEntity entity = new CourseEntity();
         entity.setTitle(request.getTitle());
