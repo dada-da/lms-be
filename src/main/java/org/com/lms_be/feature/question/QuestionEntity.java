@@ -1,7 +1,6 @@
 package org.com.lms_be.feature.question;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.com.lms_be.feature.quiz.QuizEntity;
@@ -11,17 +10,20 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name="questions")
+@Table(name = "questions")
 public class QuestionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false, length = 1000)
     private String question;
 
+    @Column(nullable = false)
+    private int sequence;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "quiz_id")
+    @JoinColumn(name = "quiz_id", nullable = false)
     private QuizEntity quiz;
 
     @Column
@@ -32,9 +34,11 @@ public class QuestionEntity {
 
     @PrePersist
     protected void onCreate() {
-        this.createdDate = Instant.now();   // Auto-set on first save
+        this.createdDate = Instant.now();
     }
 
     @PreUpdate
-    protected void onUpdate() { this.updatedDate = Instant.now(); }
+    protected void onUpdate() {
+        this.updatedDate = Instant.now();
+    }
 }

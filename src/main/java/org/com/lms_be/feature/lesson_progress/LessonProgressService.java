@@ -8,6 +8,7 @@ import org.com.lms_be.feature.lesson.LessonRepository;
 import org.com.lms_be.feature.lesson.LessonService;
 import org.com.lms_be.feature.user.UserEntity;
 import org.com.lms_be.feature.user.UserRepository;
+import org.com.lms_be.util.ContentType;
 import org.com.lms_be.util.PublishStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,10 +43,22 @@ public class LessonProgressService {
 
     @Transactional
     public LessonProgressResponseDTO upsert(LessonProgressRequestDTO request, Long studentId) {
+        LessonEntity lesson = lessonService.getById(request.getLessonId());
+        if (lesson.getContentType() == ContentType.QUIZ) {
+            throw new IllegalStateException("Quiz lessons cannot be marked manually; submit a quiz attempt instead");
+        }
+        return applyCompletion(studentId, lesson, request.getCompleted());
+    }
+
+    @Transactional
+    public LessonProgressResponseDTO markCompletedFromQuiz(Long studentId, LessonEntity lesson) {
+        return applyCompletion(studentId, lesson, true);
+    }
+
+    private LessonProgressResponseDTO applyCompletion(Long studentId, LessonEntity lesson, boolean completed) {
         UserEntity student = userRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", studentId));
 
-        LessonEntity lesson = lessonService.getById(request.getLessonId());
         if (lesson.getStatus() != PublishStatus.PUBLISHED) {
             throw new IllegalStateException("Cannot track progress on a lesson that is not published");
         }
@@ -64,8 +77,8 @@ public class LessonProgressService {
                     return fresh;
                 });
 
-        entity.setCompleted(request.getCompleted());
-        entity.setCompletedAt(request.getCompleted() ? Instant.now() : null);
+        entity.setCompleted(completed);
+        entity.setCompletedAt(completed ? Instant.now() : null);
 
         LessonProgressEntity saved = lessonProgressRepository.save(entity);
 
