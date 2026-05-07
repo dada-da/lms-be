@@ -16,6 +16,8 @@ public interface LessonRepository extends JpaRepository<LessonEntity, Long> {
 
     List<LessonEntity> findAllByStatusIn(Collection<PublishStatus> statuses);
 
+    long countByCourseIdAndStatus(Long courseId, PublishStatus status);
+
     @Modifying
     @Transactional
     @Query("UPDATE LessonEntity l SET l.status = org.com.lms_be.util.PublishStatus.ARCHIVED WHERE l.course.id = :courseId")
