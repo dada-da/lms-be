@@ -12,9 +12,7 @@ import java.util.List;
 
 public interface LessonRepository extends JpaRepository<LessonEntity, Long> {
 
-    List<LessonEntity> findAllByStatusNot(PublishStatus status);
-
-    List<LessonEntity> findAllByStatusIn(Collection<PublishStatus> statuses);
+    List<LessonEntity> findAllByCourseIdAndStatusIn(Long courseId, Collection<PublishStatus> statuses);
 
     long countByCourseIdAndStatus(Long courseId, PublishStatus status);
 

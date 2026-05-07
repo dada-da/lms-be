@@ -67,8 +67,9 @@ public class LessonService {
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson", id));
     }
 
-    public List<LessonResponseDTO> getAll(List<PublishStatus> visibleStatuses) {
-        return lessonRepository.findAllByStatusIn(visibleStatuses).stream()
+    public List<LessonResponseDTO> getAllByCourse(Long courseId, List<PublishStatus> visibleStatuses) {
+        courseService.getById(courseId);
+        return lessonRepository.findAllByCourseIdAndStatusIn(courseId, visibleStatuses).stream()
                 .map(this::toResponseDTO).toList();
     }
 

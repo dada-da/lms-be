@@ -36,10 +36,11 @@ public class LessonController {
 
     @GetMapping
     public ResponseEntity<List<LessonResponseDTO>> getAllLessons(
+            @RequestParam Long courseId,
             @RequestParam(required = false) PublishStatus status,
             Authentication auth) {
         List<PublishStatus> visible = PublishStatusAccess.resolveVisibleStatuses(status, auth);
-        return ResponseEntity.ok(lessonService.getAll(visible));
+        return ResponseEntity.ok(lessonService.getAllByCourse(courseId, visible));
     }
 
     @DeleteMapping("/{id}")
