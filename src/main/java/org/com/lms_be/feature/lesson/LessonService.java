@@ -1,6 +1,7 @@
 package org.com.lms_be.feature.lesson;
 
 import org.com.lms_be.exception.ResourceNotFoundException;
+import org.com.lms_be.util.ContentType;
 import org.com.lms_be.util.PublishStatus;
 import org.springframework.stereotype.Service;
 import org.com.lms_be.feature.course.CourseEntity;
@@ -26,10 +27,12 @@ public class LessonService {
         lessonEntity.setTitle(request.getTitle());
         lessonEntity.setDescription(request.getDescription());
         lessonEntity.setCourse(courseResponse);
-        lessonEntity.setContent(request.getContent());
         lessonEntity.setContentType(request.getContentType());
+        lessonEntity.setContent(request.getContent());
         lessonEntity.setSequence(request.getSequence());
         lessonEntity.setDurationMinutes(request.getDurationMinutes());
+
+        applyContentRule(lessonEntity);
 
         return toResponseDTO(lessonRepository.save(lessonEntity));
     }
@@ -59,6 +62,8 @@ public class LessonService {
             dto.getStatus().ifPresent(entity::setStatus);
         }
 
+        applyContentRule(entity);
+
         return toResponseDTO(lessonRepository.save(entity));
     }
 
@@ -77,6 +82,14 @@ public class LessonService {
         LessonEntity entity = getById(id);
         entity.setStatus(PublishStatus.ARCHIVED);
         lessonRepository.save(entity);
+    }
+
+    private void applyContentRule(LessonEntity entity) {
+        if (entity.getContentType() == ContentType.QUIZ) {
+            entity.setContent(null);
+        } else if (entity.getContent() == null || entity.getContent().isBlank()) {
+            throw new IllegalArgumentException("Content is required for non-quiz lessons");
+        }
     }
 
     private LessonResponseDTO toResponseDTO(LessonEntity entity) {

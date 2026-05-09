@@ -29,8 +29,8 @@ public class QuestionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<QuestionResponseDTO>> getAllQuestions(@RequestParam Long quizId) {
-        return ResponseEntity.ok(questionService.getAllByQuiz(quizId));
+    public ResponseEntity<List<QuestionResponseDTO>> getAllQuestions(@RequestParam Long lessonId) {
+        return ResponseEntity.ok(questionService.getAllByLesson(lessonId));
     }
 
     @PatchMapping("/{id}")

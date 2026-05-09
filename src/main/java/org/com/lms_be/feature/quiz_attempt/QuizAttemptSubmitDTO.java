@@ -12,9 +12,9 @@ import java.util.List;
 @Getter
 @Setter
 public class QuizAttemptSubmitDTO {
-    @NotNull(message = "Quiz ID is required")
-    @Min(value = 1, message = "Quiz ID must be at least 1")
-    private Long quizId;
+    @NotNull(message = "Lesson ID is required")
+    @Min(value = 1, message = "Lesson ID must be at least 1")
+    private Long lessonId;
 
     @Valid
     private List<QuizAnswerSubmissionDTO> answers = new ArrayList<>();

@@ -8,5 +8,5 @@ import java.util.List;
 @Repository
 public interface QuizAttemptRepository extends JpaRepository<QuizAttemptEntity, Long> {
 
-    List<QuizAttemptEntity> findAllByStudentIdAndQuizIdOrderByAttemptAtDesc(Long studentId, Long quizId);
+    List<QuizAttemptEntity> findAllByStudentIdAndLessonIdOrderByAttemptAtDesc(Long studentId, Long lessonId);
 }

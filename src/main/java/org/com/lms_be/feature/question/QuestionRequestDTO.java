@@ -18,7 +18,7 @@ public class QuestionRequestDTO {
     @Min(value = 1, message = "Sequence must be at least 1")
     private Integer sequence;
 
-    @NotNull(message = "Quiz ID cannot be null")
-    @Min(value = 1, message = "Quiz ID must be at least 1")
-    private Long quizId;
+    @NotNull(message = "Lesson ID cannot be null")
+    @Min(value = 1, message = "Lesson ID must be at least 1")
+    private Long lessonId;
 }

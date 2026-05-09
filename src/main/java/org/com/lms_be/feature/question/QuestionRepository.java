@@ -8,7 +8,7 @@ import java.util.List;
 @Repository
 public interface QuestionRepository extends JpaRepository<QuestionEntity, Long> {
 
-    List<QuestionEntity> findAllByQuizIdOrderBySequenceAsc(Long quizId);
+    List<QuestionEntity> findAllByLessonIdOrderBySequenceAsc(Long lessonId);
 
-    long countByQuizId(Long quizId);
+    long countByLessonId(Long lessonId);
 }

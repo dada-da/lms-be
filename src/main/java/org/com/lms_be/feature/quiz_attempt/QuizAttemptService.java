@@ -5,15 +5,14 @@ import org.com.lms_be.feature.answer.AnswerEntity;
 import org.com.lms_be.feature.answer.AnswerRepository;
 import org.com.lms_be.feature.enrollment.EnrollmentRepository;
 import org.com.lms_be.feature.lesson.LessonEntity;
+import org.com.lms_be.feature.lesson.LessonService;
 import org.com.lms_be.feature.lesson_progress.LessonProgressService;
 import org.com.lms_be.feature.question.QuestionEntity;
 import org.com.lms_be.feature.question.QuestionRepository;
-import org.com.lms_be.feature.quiz.QuizEntity;
-import org.com.lms_be.feature.quiz.QuizService;
 import org.com.lms_be.feature.user.UserEntity;
 import org.com.lms_be.feature.user.UserRepository;
+import org.com.lms_be.util.ContentType;
 import org.com.lms_be.util.PublishStatus;
-import org.com.lms_be.util.QuizAttempt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
 public class QuizAttemptService {
 
     private final QuizAttemptRepository quizAttemptRepository;
-    private final QuizService quizService;
+    private final LessonService lessonService;
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final UserRepository userRepository;
@@ -36,14 +35,14 @@ public class QuizAttemptService {
     private final LessonProgressService lessonProgressService;
 
     public QuizAttemptService(QuizAttemptRepository quizAttemptRepository,
-                              QuizService quizService,
+                              LessonService lessonService,
                               QuestionRepository questionRepository,
                               AnswerRepository answerRepository,
                               UserRepository userRepository,
                               EnrollmentRepository enrollmentRepository,
                               LessonProgressService lessonProgressService) {
         this.quizAttemptRepository = quizAttemptRepository;
-        this.quizService = quizService;
+        this.lessonService = lessonService;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
         this.userRepository = userRepository;
@@ -52,15 +51,17 @@ public class QuizAttemptService {
     }
 
     @Transactional
-    public QuizAttemptResponseDTO submit(QuizAttemptSubmitDTO request, Long studentId) {
+    public QuizAttemptResultDTO submit(QuizAttemptSubmitDTO request, Long studentId) {
         UserEntity student = userRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", studentId));
 
-        QuizEntity quiz = quizService.getById(request.getQuizId());
-        LessonEntity lesson = quiz.getLesson();
+        LessonEntity lesson = lessonService.getById(request.getLessonId());
 
+        if (lesson.getContentType() != ContentType.QUIZ) {
+            throw new IllegalStateException("Lesson is not a quiz");
+        }
         if (lesson.getStatus() != PublishStatus.PUBLISHED) {
-            throw new IllegalStateException("Cannot submit attempt for a quiz on an unpublished lesson");
+            throw new IllegalStateException("Cannot submit attempt for an unpublished quiz lesson");
         }
 
         Long courseId = lesson.getCourse().getId();
@@ -68,7 +69,7 @@ public class QuizAttemptService {
             throw new IllegalStateException("Student is not enrolled in the course this quiz belongs to");
         }
 
-        List<QuestionEntity> questions = questionRepository.findAllByQuizIdOrderBySequenceAsc(quiz.getId());
+        List<QuestionEntity> questions = questionRepository.findAllByLessonIdOrderBySequenceAsc(lesson.getId());
         if (questions.isEmpty()) {
             throw new IllegalStateException("Quiz has no questions");
         }
@@ -89,25 +90,18 @@ public class QuizAttemptService {
             }
         }
 
-        int score = (int) Math.round(100.0 * correctCount / questions.size());
-        QuizAttempt status = score >= quiz.getPassingScore() ? QuizAttempt.PASS : QuizAttempt.FAIL;
-
         QuizAttemptEntity attempt = new QuizAttemptEntity();
         attempt.setStudent(student);
-        attempt.setQuiz(quiz);
-        attempt.setScore(score);
-        attempt.setStatus(status);
+        attempt.setLesson(lesson);
         QuizAttemptEntity saved = quizAttemptRepository.save(attempt);
 
-        if (status == QuizAttempt.PASS) {
-            lessonProgressService.markCompletedFromQuiz(student.getId(), lesson);
-        }
+        lessonProgressService.markCompletedFromQuiz(student.getId(), lesson);
 
-        return QuizAttemptResponseDTO.from(saved);
+        return QuizAttemptResultDTO.from(saved, correctCount, questions.size());
     }
 
-    public List<QuizAttemptResponseDTO> getMyAttemptsForQuiz(Long studentId, Long quizId) {
-        return quizAttemptRepository.findAllByStudentIdAndQuizIdOrderByAttemptAtDesc(studentId, quizId).stream()
+    public List<QuizAttemptResponseDTO> getMyAttemptsForLesson(Long studentId, Long lessonId) {
+        return quizAttemptRepository.findAllByStudentIdAndLessonIdOrderByAttemptAtDesc(studentId, lessonId).stream()
                 .map(QuizAttemptResponseDTO::from)
                 .toList();
     }

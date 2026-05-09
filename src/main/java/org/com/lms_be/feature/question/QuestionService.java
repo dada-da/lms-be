@@ -1,8 +1,9 @@
 package org.com.lms_be.feature.question;
 
 import org.com.lms_be.exception.ResourceNotFoundException;
-import org.com.lms_be.feature.quiz.QuizEntity;
-import org.com.lms_be.feature.quiz.QuizService;
+import org.com.lms_be.feature.lesson.LessonEntity;
+import org.com.lms_be.feature.lesson.LessonService;
+import org.com.lms_be.util.ContentType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,21 +14,24 @@ import java.util.List;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
-    private final QuizService quizService;
+    private final LessonService lessonService;
 
-    public QuestionService(QuestionRepository questionRepository, QuizService quizService) {
+    public QuestionService(QuestionRepository questionRepository, LessonService lessonService) {
         this.questionRepository = questionRepository;
-        this.quizService = quizService;
+        this.lessonService = lessonService;
     }
 
     @Transactional
     public QuestionResponseDTO create(QuestionRequestDTO request) {
-        QuizEntity quiz = quizService.getById(request.getQuizId());
+        LessonEntity lesson = lessonService.getById(request.getLessonId());
+        if (lesson.getContentType() != ContentType.QUIZ) {
+            throw new IllegalStateException("Questions can only be attached to a lesson of contentType=QUIZ");
+        }
 
         QuestionEntity entity = new QuestionEntity();
         entity.setQuestion(request.getQuestion());
         entity.setSequence(request.getSequence());
-        entity.setQuiz(quiz);
+        entity.setLesson(lesson);
 
         return QuestionResponseDTO.from(questionRepository.save(entity));
     }
@@ -41,9 +45,9 @@ public class QuestionService {
                 .orElseThrow(() -> new ResourceNotFoundException("Question", id));
     }
 
-    public List<QuestionResponseDTO> getAllByQuiz(Long quizId) {
-        quizService.getById(quizId);
-        return questionRepository.findAllByQuizIdOrderBySequenceAsc(quizId).stream()
+    public List<QuestionResponseDTO> getAllByLesson(Long lessonId) {
+        lessonService.getById(lessonId);
+        return questionRepository.findAllByLessonIdOrderBySequenceAsc(lessonId).stream()
                 .map(QuestionResponseDTO::from)
                 .toList();
     }

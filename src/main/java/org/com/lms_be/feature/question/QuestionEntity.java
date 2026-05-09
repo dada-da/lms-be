@@ -3,7 +3,7 @@ package org.com.lms_be.feature.question;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.com.lms_be.feature.quiz.QuizEntity;
+import org.com.lms_be.feature.lesson.LessonEntity;
 
 import java.time.Instant;
 
@@ -23,8 +23,8 @@ public class QuestionEntity {
     private int sequence;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "quiz_id", nullable = false)
-    private QuizEntity quiz;
+    @JoinColumn(name = "lesson_id", nullable = false)
+    private LessonEntity lesson;
 
     @Column
     private Instant updatedDate;

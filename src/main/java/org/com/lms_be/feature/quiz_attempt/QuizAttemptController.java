@@ -20,15 +20,15 @@ public class QuizAttemptController {
     }
 
     @PostMapping
-    public ResponseEntity<QuizAttemptResponseDTO> submit(@Valid @RequestBody QuizAttemptSubmitDTO request,
-                                                         Authentication auth) {
-        QuizAttemptResponseDTO created = quizAttemptService.submit(request, AuthUtil.currentUserId(auth));
+    public ResponseEntity<QuizAttemptResultDTO> submit(@Valid @RequestBody QuizAttemptSubmitDTO request,
+                                                       Authentication auth) {
+        QuizAttemptResultDTO created = quizAttemptService.submit(request, AuthUtil.currentUserId(auth));
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping
-    public ResponseEntity<List<QuizAttemptResponseDTO>> getMyAttemptsForQuiz(@RequestParam Long quizId,
-                                                                             Authentication auth) {
-        return ResponseEntity.ok(quizAttemptService.getMyAttemptsForQuiz(AuthUtil.currentUserId(auth), quizId));
+    public ResponseEntity<List<QuizAttemptResponseDTO>> getMyAttemptsForLesson(@RequestParam Long lessonId,
+                                                                               Authentication auth) {
+        return ResponseEntity.ok(quizAttemptService.getMyAttemptsForLesson(AuthUtil.currentUserId(auth), lessonId));
     }
 }

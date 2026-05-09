@@ -3,9 +3,8 @@ package org.com.lms_be.feature.quiz_attempt;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.com.lms_be.feature.quiz.QuizEntity;
+import org.com.lms_be.feature.lesson.LessonEntity;
 import org.com.lms_be.feature.user.UserEntity;
-import org.com.lms_be.util.QuizAttempt;
 
 import java.time.Instant;
 
@@ -19,20 +18,13 @@ public class QuizAttemptEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private int score;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity student;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "quiz_id", nullable = false)
-    private QuizEntity quiz;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 16)
-    private QuizAttempt status;
+    @JoinColumn(name = "lesson_id", nullable = false)
+    private LessonEntity lesson;
 
     @Column(nullable = false, updatable = false)
     private Instant attemptAt;

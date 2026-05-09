@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.com.lms_be.util.ContentType;
@@ -25,10 +26,9 @@ public class LessonRequestDTO {
     @Min(value = 0, message = "Duration must be 0 or greater")
     private Integer durationMinutes;
 
-    @NotBlank
     private String content;
 
-    @NotBlank
+    @NotNull(message = "Content type is required")
     private ContentType contentType = ContentType.TEXT;
 
     @NotNull(message = "Course ID cannot be null")
