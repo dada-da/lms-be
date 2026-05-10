@@ -2,6 +2,7 @@ package org.com.lms_be.feature.lesson;
 
 import org.com.lms_be.exception.ResourceNotFoundException;
 import org.com.lms_be.util.ContentType;
+import org.com.lms_be.util.HtmlSanitizer;
 import org.com.lms_be.util.PublishStatus;
 import org.springframework.stereotype.Service;
 import org.com.lms_be.feature.course.CourseEntity;
@@ -13,10 +14,14 @@ import java.util.List;
 public class LessonService {
     private final CourseService courseService;
     private final LessonRepository lessonRepository;
+    private final HtmlSanitizer htmlSanitizer;
 
-    public LessonService(CourseService courseService, LessonRepository lessonRepository) {
+    public LessonService(CourseService courseService,
+                         LessonRepository lessonRepository,
+                         HtmlSanitizer htmlSanitizer) {
         this.courseService = courseService;
         this.lessonRepository = lessonRepository;
+        this.htmlSanitizer = htmlSanitizer;
     }
 
     public LessonResponseDTO create(LessonRequestDTO request) {
@@ -87,8 +92,13 @@ public class LessonService {
     private void applyContentRule(LessonEntity entity) {
         if (entity.getContentType() == ContentType.QUIZ) {
             entity.setContent(null);
-        } else if (entity.getContent() == null || entity.getContent().isBlank()) {
+            return;
+        }
+        if (entity.getContent() == null || entity.getContent().isBlank()) {
             throw new IllegalArgumentException("Content is required for non-quiz lessons");
+        }
+        if (entity.getContentType() == ContentType.TEXT) {
+            entity.setContent(htmlSanitizer.sanitize(entity.getContent()));
         }
     }
 

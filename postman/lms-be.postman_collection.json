@@ -1,0 +1,681 @@
+{
+  "info": {
+    "name": "LMS Backend",
+    "description": "Postman collection for the LMS Spring Boot backend. Set `baseUrl`, then run **Auth → Login** to populate `token` automatically. All other requests use the saved bearer token.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "9d6fdf4a-6f3e-4f9a-9f3c-1b1c1b1c1b1c"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{token}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "userId", "value": "1", "type": "string" },
+    { "key": "courseId", "value": "1", "type": "string" },
+    { "key": "lessonId", "value": "1", "type": "string" },
+    { "key": "quizLessonId", "value": "2", "type": "string" },
+    { "key": "questionId", "value": "1", "type": "string" },
+    { "key": "answerId", "value": "1", "type": "string" },
+    { "key": "enrollmentId", "value": "1", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  if (data && data.token) {",
+                  "    pm.collectionVariables.set('token', data.token);",
+                  "    console.log('Saved token to collection variable.');",
+                  "  }",
+                  "  if (data && data.id) {",
+                  "    pm.collectionVariables.set('userId', String(data.id));",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Create user",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"STUDENT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Get user by id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get all users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Update user (patch)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1.updated@example.com\",\n  \"role\": \"STUDENT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete user",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "List categories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/category",
+              "host": ["{{baseUrl}}"],
+              "path": ["category"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "Create course",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Introduction to Spring Boot\",\n  \"description\": \"A practical, project-based introduction to building REST APIs with Spring Boot 4.\",\n  \"thumbnailUrl\": \"https://example.com/images/spring-boot.png\",\n  \"price\": 29.99,\n  \"category\": \"PROGRAMMING\",\n  \"tags\": [\"java\", \"spring\", \"backend\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/course",
+              "host": ["{{baseUrl}}"],
+              "path": ["course"]
+            }
+          }
+        },
+        {
+          "name": "Get course by id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/course/{{courseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["course", "{{courseId}}"]
+            }
+          }
+        },
+        {
+          "name": "List courses (optionally filter by status)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/course?status=PUBLISHED",
+              "host": ["{{baseUrl}}"],
+              "path": ["course"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PUBLISHED",
+                  "description": "DRAFT | PUBLISHED | ARCHIVED — omit to use role-based defaults"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update course (patch)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Spring Boot — Updated\",\n  \"description\": \"Now covering Spring Security and JWT.\",\n  \"price\": 34.99,\n  \"category\": \"PROGRAMMING\",\n  \"tags\": [\"java\", \"spring\", \"jwt\"],\n  \"status\": \"PUBLISHED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/course/{{courseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["course", "{{courseId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete course",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/course/{{courseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["course", "{{courseId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lessons",
+      "item": [
+        {
+          "name": "Create lesson (TEXT)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"What is Spring Boot?\",\n  \"description\": \"High-level overview of Spring Boot.\",\n  \"sequence\": 1,\n  \"durationMinutes\": 10,\n  \"content\": \"Spring Boot is an opinionated framework that simplifies bootstrapping Spring applications...\",\n  \"contentType\": \"TEXT\",\n  \"courseId\": {{courseId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lesson",
+              "host": ["{{baseUrl}}"],
+              "path": ["lesson"]
+            }
+          }
+        },
+        {
+          "name": "Create lesson (VIDEO)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Building your first endpoint\",\n  \"description\": \"Walkthrough video.\",\n  \"sequence\": 2,\n  \"durationMinutes\": 15,\n  \"content\": \"https://example.com/videos/first-endpoint.mp4\",\n  \"contentType\": \"VIDEO\",\n  \"courseId\": {{courseId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lesson",
+              "host": ["{{baseUrl}}"],
+              "path": ["lesson"]
+            }
+          }
+        },
+        {
+          "name": "Create lesson (QUIZ — no content)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Module 1 knowledge check\",\n  \"description\": \"A short quiz to verify the module's concepts.\",\n  \"sequence\": 3,\n  \"durationMinutes\": 5,\n  \"contentType\": \"QUIZ\",\n  \"courseId\": {{courseId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lesson",
+              "host": ["{{baseUrl}}"],
+              "path": ["lesson"]
+            }
+          }
+        },
+        {
+          "name": "Get lesson by id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/lesson/{{lessonId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["lesson", "{{lessonId}}"]
+            }
+          }
+        },
+        {
+          "name": "List lessons by course",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/lesson?courseId={{courseId}}&status=PUBLISHED",
+              "host": ["{{baseUrl}}"],
+              "path": ["lesson"],
+              "query": [
+                { "key": "courseId", "value": "{{courseId}}" },
+                {
+                  "key": "status",
+                  "value": "PUBLISHED",
+                  "description": "DRAFT | PUBLISHED | ARCHIVED — optional"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update lesson (patch)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"What is Spring Boot? (revised)\",\n  \"description\": \"Updated overview.\",\n  \"sequence\": 1,\n  \"durationMinutes\": 12,\n  \"content\": \"Spring Boot streamlines configuration via auto-configuration and starters...\",\n  \"contentType\": \"TEXT\",\n  \"status\": \"PUBLISHED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lesson/{{lessonId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["lesson", "{{lessonId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete lesson",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/lesson/{{lessonId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["lesson", "{{lessonId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lesson Progress",
+      "item": [
+        {
+          "name": "Mark lesson completed",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lessonId\": {{lessonId}},\n  \"completed\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lesson-progress",
+              "host": ["{{baseUrl}}"],
+              "path": ["lesson-progress"]
+            }
+          }
+        },
+        {
+          "name": "List my progress for a course",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/lesson-progress?courseId={{courseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["lesson-progress"],
+              "query": [
+                { "key": "courseId", "value": "{{courseId}}" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Enrollments",
+      "item": [
+        {
+          "name": "Enroll in a course",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": {{courseId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enrollment",
+              "host": ["{{baseUrl}}"],
+              "path": ["enrollment"]
+            }
+          }
+        },
+        {
+          "name": "Get enrollment by id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/enrollment/{{enrollmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["enrollment", "{{enrollmentId}}"]
+            }
+          }
+        },
+        {
+          "name": "List my enrollments",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/enrollment",
+              "host": ["{{baseUrl}}"],
+              "path": ["enrollment"]
+            }
+          }
+        },
+        {
+          "name": "Unenroll",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/enrollment/{{enrollmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["enrollment", "{{enrollmentId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Questions",
+      "item": [
+        {
+          "name": "Create question (on a quiz lesson)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Which annotation marks a Spring Boot application's entry point?\",\n  \"sequence\": 1,\n  \"lessonId\": {{quizLessonId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/question",
+              "host": ["{{baseUrl}}"],
+              "path": ["question"]
+            }
+          }
+        },
+        {
+          "name": "Get question by id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/question/{{questionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["question", "{{questionId}}"]
+            }
+          }
+        },
+        {
+          "name": "List questions for a quiz lesson",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/question?lessonId={{quizLessonId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["question"],
+              "query": [
+                { "key": "lessonId", "value": "{{quizLessonId}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update question (patch)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Which annotation marks the main class of a Spring Boot app?\",\n  \"sequence\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/question/{{questionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["question", "{{questionId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete question",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/question/{{questionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["question", "{{questionId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Answers",
+      "item": [
+        {
+          "name": "Create answer (correct)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": \"@SpringBootApplication\",\n  \"correct\": true,\n  \"questionId\": {{questionId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["answer"]
+            }
+          }
+        },
+        {
+          "name": "Create answer (incorrect)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": \"@EnableAutoConfiguration\",\n  \"correct\": false,\n  \"questionId\": {{questionId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["answer"]
+            }
+          }
+        },
+        {
+          "name": "Get answer by id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/answer/{{answerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["answer", "{{answerId}}"]
+            }
+          }
+        },
+        {
+          "name": "List answers for a question",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/answer?questionId={{questionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["answer"],
+              "query": [
+                { "key": "questionId", "value": "{{questionId}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update answer (patch)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": \"@SpringBootApplication (updated)\",\n  \"correct\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/answer/{{answerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["answer", "{{answerId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete answer",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/answer/{{answerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["answer", "{{answerId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quiz Attempts",
+      "item": [
+        {
+          "name": "Submit attempt",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lessonId\": {{quizLessonId}},\n  \"answers\": [\n    {\n      \"questionId\": {{questionId}},\n      \"selectedAnswerIds\": [{{answerId}}]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/quiz-attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["quiz-attempt"]
+            },
+            "description": "Returns `{ id, studentId, lessonId, correctCount, totalQuestions, attemptAt }`. Submitting also marks the quiz lesson as completed."
+          }
+        },
+        {
+          "name": "List my attempts for a quiz lesson",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/quiz-attempt?lessonId={{quizLessonId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["quiz-attempt"],
+              "query": [
+                { "key": "lessonId", "value": "{{quizLessonId}}" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Actuator health",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "health"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
