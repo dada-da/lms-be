@@ -39,7 +39,7 @@ public class LessonEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16, columnDefinition = "VARCHAR(16) DEFAULT 'PUBLISHED'")
-    private PublishStatus status = PublishStatus.DRAFT;
+    private PublishStatus status = PublishStatus.PUBLISHED;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")

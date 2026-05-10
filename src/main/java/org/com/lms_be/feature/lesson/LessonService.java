@@ -4,6 +4,7 @@ import org.com.lms_be.exception.ResourceNotFoundException;
 import org.com.lms_be.util.ContentType;
 import org.com.lms_be.util.HtmlSanitizer;
 import org.com.lms_be.util.PublishStatus;
+import org.com.lms_be.util.VideoContentValidator;
 import org.springframework.stereotype.Service;
 import org.com.lms_be.feature.course.CourseEntity;
 import org.com.lms_be.feature.course.CourseService;
@@ -15,13 +16,16 @@ public class LessonService {
     private final CourseService courseService;
     private final LessonRepository lessonRepository;
     private final HtmlSanitizer htmlSanitizer;
+    private final VideoContentValidator videoContentValidator;
 
     public LessonService(CourseService courseService,
                          LessonRepository lessonRepository,
-                         HtmlSanitizer htmlSanitizer) {
+                         HtmlSanitizer htmlSanitizer,
+                         VideoContentValidator videoContentValidator) {
         this.courseService = courseService;
         this.lessonRepository = lessonRepository;
         this.htmlSanitizer = htmlSanitizer;
+        this.videoContentValidator = videoContentValidator;
     }
 
     public LessonResponseDTO create(LessonRequestDTO request) {
@@ -98,7 +102,10 @@ public class LessonService {
             throw new IllegalArgumentException("Content is required for non-quiz lessons");
         }
         if (entity.getContentType() == ContentType.TEXT) {
-            entity.setContent(htmlSanitizer.sanitize(entity.getContent()));
+            videoContentValidator.rejectVideoTags(entity.getContent());
+            String sanitized = htmlSanitizer.sanitize(entity.getContent());
+            videoContentValidator.rejectVideoUrls(sanitized);
+            entity.setContent(sanitized);
         }
     }
 
